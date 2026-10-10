@@ -16,3 +16,4 @@
 | D-012 | 2026-10-11 | 물리 50 Hz, 고속 센서 25 Hz, 저속 센서 5 Hz | 120 s run 레코드 수를 약 10만으로 제한(데이터셋 용량) | 센서 50/10 Hz |
 | D-013 | 2026-10-11 | 기본 작업 시나리오는 패키지 내부 `twinpilot_sim/scenarios/`, 변형은 `simulation/tasks/` | 설치 위치와 무관하게 로드 | 저장소 경로 고정 |
 | D-014 | 2026-10-11 | CLI·서버는 `python -m` 으로 실행 | 로컬 Windows 애플리케이션 제어 정책이 uv 생성 `.exe` 진입점 차단 (os error 4551) | console script exe |
+| D-015 | 2026-10-11 | Isolation Forest를 NumPy로 직접 구현 (`twinpilot_ai.anomaly.iforest`), scikit-learn은 CI 동등성 테스트용 선택 의존성 | 개발 PC의 Smart App Control이 scikit-learn·SciPy·일부 numpy 확장 DLL을 버전 무관하게 차단 | 정책 해제, WSL에서 학습 |
