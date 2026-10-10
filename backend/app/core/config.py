@@ -9,7 +9,7 @@ class Settings(BaseSettings):
 
     runs_dir: Path = Path("runs")
     db_path: Path = Path("runs/index.sqlite")
-    cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    cors_origins: list[str] = ["http://localhost:5290", "http://127.0.0.1:5290"]
     model_path: Path = Path("ai/models/detector-v1.joblib")
     tick_hz: float = 50.0
     broadcast_hz: float = 10.0

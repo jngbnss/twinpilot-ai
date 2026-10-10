@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { TopBar } from "./components/TopBar";
+import { ControlView } from "./features/control/ControlView";
 import { api } from "./services/api";
 import { TwinSocket, wsUrl } from "./services/ws";
 import { useTwin } from "./store/useTwin";
@@ -35,7 +36,8 @@ export default function App() {
         ))}
       </nav>
       <main className="content">
-        <div className="panel">탭: {tab}</div>
+        {tab === "control" && <ControlView />}
+        {tab !== "control" && <div className="panel">준비 중: {tab}</div>}
       </main>
     </div>
   );

@@ -1,7 +1,7 @@
 """End-to-end smoke test against a running backend.
 
-uv run python -m uvicorn app.main:app --app-dir backend --port 8000
-uv run python scripts/ws_smoke.py [--base http://127.0.0.1:8000]
+uv run python -m uvicorn app.main:app --app-dir backend --port 8770
+uv run python scripts/ws_smoke.py [--base http://127.0.0.1:8770]
 """
 
 from __future__ import annotations
@@ -55,7 +55,7 @@ def check(cond: bool, label: str) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--base", default="http://127.0.0.1:8000")
+    ap.add_argument("--base", default="http://127.0.0.1:8770")
     a = ap.parse_args()
     ws_url = a.base.replace("http", "ws") + "/ws/twin"
     c = httpx.Client(base_url=a.base, timeout=30)

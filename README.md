@@ -39,8 +39,8 @@ uv run python -m twinpilot_sim run --seed 1 --duration 120   --fault simulation/
 uv run python -m twinpilot_ai.training.make_dataset --version v1 --workers 10
 uv run python -m twinpilot_ai.evaluation.evaluate
 
-# 백엔드 (http://127.0.0.1:8000/docs)
-uv run python -m uvicorn app.main:app --app-dir backend --port 8000
+# 백엔드 (http://127.0.0.1:8770/docs)
+uv run python -m uvicorn app.main:app --app-dir backend --port 8770
 uv run python scripts/ws_smoke.py       # 다른 터미널에서 E2E 스모크
 uv run python scripts/anomaly_smoke.py  # 고장 주입 → 이상 탐지 스모크
 ```

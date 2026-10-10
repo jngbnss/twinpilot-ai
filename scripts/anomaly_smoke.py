@@ -1,7 +1,7 @@
 """Smoke test: inject a fault into a live autopilot run and watch anomaly_state change.
 
 Requires a running backend with a trained model (ai/models/detector-v1.joblib).
-uv run python scripts/anomaly_smoke.py [--base http://127.0.0.1:8000]
+uv run python scripts/anomaly_smoke.py [--base http://127.0.0.1:8770]
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ import httpx
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--base", default="http://127.0.0.1:8000")
+    ap.add_argument("--base", default="http://127.0.0.1:8770")
     ap.add_argument("--fault", default="JOINT_LAG")
     ap.add_argument("--target", default="bucket_joint")
     ap.add_argument("--severity", type=float, default=0.9)

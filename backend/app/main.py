@@ -1,6 +1,6 @@
 """TwinPilot backend entry point.
 
-Run: uv run python -m uvicorn app.main:app --app-dir backend --port 8000
+Run: uv run python -m uvicorn app.main:app --app-dir backend --port 8770
 """
 
 from contextlib import asynccontextmanager
