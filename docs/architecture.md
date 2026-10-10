@@ -48,3 +48,24 @@
 | WS | `/ws/twin` | 10 Hz 스냅샷 push, 클라이언트 → `{type: control/estop/ping}` |
 
 API 핸들러는 스레드풀, tick 루프는 이벤트 루프에서 돌기 때문에 Engine 변경 메서드는 RLock으로 직렬화한다.
+
+## Phase 3 — `ai/twinpilot_ai` + `backend/app/anomaly`
+
+| 모듈 | 역할 |
+|------|------|
+| `training/make_dataset.py` | 고정 seed 데이터셋 생성 (정상·고장·미확인), run 단위 분할, 매니페스트 |
+| `features/windows.py` | 2 s 창 특징 — raw/delta/rolling/full/residual. 오프라인·온라인 공용 `features_batch` |
+| `features/dataset.py` | Parquet → 창 + 라벨 (50% 겹침, 고장 후 10 s 제외) |
+| `anomaly/iforest.py` | NumPy Isolation Forest (D-015) |
+| `anomaly/detectors.py` | Threshold / Z-score / Tail-Z / IF, val 정상 FPR 1% 보정, 설명(관련 센서) |
+| `training/train.py`, `evaluation/` | 학습, 실험 1~3, `docs/eval/eval-v1.md` |
+| `training/fixtures.py` | CI용 소형 데이터셋·번들 (즉석 생성) |
+| `backend/app/anomaly/service.py` | 0.5 s마다 최근 2 s 창 추론 → `anomaly_state`, 연속 2창 경보 이벤트 (읽기 전용) |
+| `backend/app/api/anomalies.py` | `GET /api/anomalies`, `GET /api/anomalies/compare` |
+
+재현:
+
+```bash
+uv run python -m twinpilot_ai.training.make_dataset --version v1 --workers 10   # 약 2분
+uv run python -m twinpilot_ai.evaluation.evaluate                                 # 약 2분, 모델 저장
+```

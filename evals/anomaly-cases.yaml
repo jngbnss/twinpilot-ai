@@ -1,0 +1,29 @@
+# Fixed anomaly-detection cases checked in CI with the fixture bundle
+# (twinpilot_ai.training.fixtures: 6 train + 3 val normal runs, residual features).
+# Each case is a deterministic run: seed + fault. Expectation is on the primary detector.
+cases:
+  - id: joint-lag-bucket-strong
+    seed: 501
+    duration: 60
+    fault: {fault_id: c1, type: JOINT_LAG, target: bucket_joint, start_time: 20, duration: 20, severity: 0.9}
+    expect: {detected: true, max_delay_s: 6.0}
+  - id: sensor-stuck-boom-position
+    seed: 502
+    duration: 60
+    fault: {fault_id: c2, type: SENSOR_STUCK, target: boom_joint.position, start_time: 20, duration: 15, severity: 1.0}
+    expect: {detected: true, max_delay_s: 3.0}
+  - id: sensor-noise-arm-effort
+    seed: 503
+    duration: 60
+    fault: {fault_id: c3, type: SENSOR_NOISE, target: arm_joint.effort, start_time: 20, duration: 15, severity: 0.9}
+    expect: {detected: true, max_delay_s: 3.0}
+  - id: temp-rise-strong
+    seed: 504
+    duration: 60
+    fault: {fault_id: c4, type: TEMP_RISE, target: hydraulic, start_time: 20, duration: 25, severity: 0.9}
+    expect: {detected: true, max_delay_s: 6.0}
+  - id: normal-run
+    seed: 505
+    duration: 60
+    fault: null
+    expect: {max_window_fpr: 0.05}

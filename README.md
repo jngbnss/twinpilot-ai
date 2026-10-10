@@ -35,12 +35,27 @@ uv run python -m twinpilot_sim run --seed 1 --duration 120   --fault simulation/
 ```
 
 ```bash
+# 데이터셋·이상 탐지 모델 (최초 1회, 약 4분)
+uv run python -m twinpilot_ai.training.make_dataset --version v1 --workers 10
+uv run python -m twinpilot_ai.evaluation.evaluate
+
 # 백엔드 (http://127.0.0.1:8000/docs)
 uv run python -m uvicorn app.main:app --app-dir backend --port 8000
-uv run python scripts/ws_smoke.py   # 다른 터미널에서 E2E 스모크
+uv run python scripts/ws_smoke.py       # 다른 터미널에서 E2E 스모크
+uv run python scripts/anomaly_smoke.py  # 고장 주입 → 이상 탐지 스모크
 ```
 
 > Windows 애플리케이션 제어 정책이 uv가 만든 `.exe` 진입점을 차단할 수 있어 `python -m` 형식을 쓴다.
+
+## 이상 탐지 결과 요약 (dataset v1, test split)
+
+| 모델 | F1 | run 탐지율 | 탐지 지연 중앙값 |
+|------|----|-----------|----------------|
+| Z-score (full 특징) | 0.723 | 0.78 | 1.2 s |
+| Isolation Forest (full 특징) | 0.000 | 0.00 | – |
+| **Tail-normalized Z-score + 물리 잔차 특징 (운영)** | **0.828** | **0.91** | **0.8 s** |
+
+자세한 내용: [`docs/experiments.md`](docs/experiments.md), [`docs/eval/eval-v1.md`](docs/eval/eval-v1.md).
 
 ## 범위 밖
 

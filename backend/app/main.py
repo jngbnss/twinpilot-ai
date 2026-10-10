@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.anomalies import router as anomalies_router
 from app.api.routes import router, ws_router
 from app.core.config import Settings, get_settings
 from app.engine import Engine
@@ -46,6 +47,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(router)
+    app.include_router(anomalies_router)
     app.include_router(ws_router)
     return app
 

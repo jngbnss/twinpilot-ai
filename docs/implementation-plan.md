@@ -150,7 +150,7 @@ class AnomalyDetector(Protocol):                    # ai
 | P3-2 | 특징량 | features/ | 결정성·창 경계 테스트 | 완료 | 특징 세트 4종·온라인/배치 동일·기구학 잔차 값 검증 (ai 10 passed) |
 | P3-3 | 탐지기 3종 (Threshold · Z-score · IF) | anomaly/ | fixture 학습·추론 | 완료 | Threshold·Z-score·NumPy IF 분리·설명·결정성·번들 저장 테스트 통과, v1 학습 18 s (sklearn 동등성 테스트는 CI에서 실행) |
 | P3-4 | 평가 · 실험 1~3 기록 | evaluation/, reports/eval-v1.md, experiments.md | twinpilot-eval 실행, 표 생성 | 완료 | 실험 1~3 실행·docs/eval/eval-v1.md 생성(92~112 s), 선정 Tail-Z+residual test F1 0.828·run 탐지율 0.91·지연 0.84 s, experiments.md 기록 |
-| P3-5 | 실시간 탐지 서비스 · CI fixture · evals | backend/app/anomaly, evals/anomaly-cases.yaml | JOINT_LAG 주입 시 anomaly_state 변화 | 진행중 |  |
+| P3-5 | 실시간 탐지 서비스 · CI fixture · evals | backend/app/anomaly, evals/anomaly-cases.yaml | JOINT_LAG 주입 시 anomaly_state 변화 | 완료 | 실서버+v1 모델 anomaly_smoke OK (JOINT_LAG 5.4 s·SENSOR_STUCK 1.0 s 경보), evals 5 case·서비스·compare 테스트 포함 pytest 93 passed |
 
 ### Phase 4 — 대시보드 (`prompts/phase-4-dashboard.md`)
 
