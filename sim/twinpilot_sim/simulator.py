@@ -13,7 +13,7 @@ from dataclasses import replace
 import numpy as np
 
 from twinpilot_sim.adapter import ActuatorCommand, FaultModel, GroundTruth, JointTruth, NoFaults
-from twinpilot_sim.kinematics import front_pose, to_world, wrap_angle
+from twinpilot_sim.kinematics import front_moment, front_pose, to_world, wrap_angle
 from twinpilot_sim.params import ExcavatorParams, default_params
 from twinpilot_sim.schema import AXIS_TO_JOINT, JOINTS, TRACKS, Quality, TelemetryRecord
 from twinpilot_sim.units import Unit
@@ -107,15 +107,7 @@ class PythonSimulator:
         return self.world.payload_mass * self.payload_scale
 
     def _front_moment(self, boom: float, arm: float, bucket: float, payload: float) -> float:
-        """Horizontal moment (kg*m) of the front attachment about the swing center."""
-        p = self.params
-        fp = front_pose(p, boom, arm, bucket)
-        lk = p.links
-        return (
-            lk.boom.mass_kg * (fp.pivot.r + fp.boom_tip.r) / 2
-            + lk.arm.mass_kg * (fp.boom_tip.r + fp.arm_tip.r) / 2
-            + (lk.bucket.mass_kg + payload) * fp.bucket_center.r
-        )
+        return front_moment(self.params, boom, arm, bucket, payload)
 
     def _gravity_torques(self, payload: float) -> dict[str, float]:
         p = self.params
@@ -394,6 +386,7 @@ class PythonSimulator:
             footprint_radius=fr,
             worker_distance=self.world.worker_distance((self.x, self.y), fr, (bc[0], bc[1])),
             payload_id=payload.object_id if payload else None,
+            payload_mass=self._payload_mass(),
             objects=[replace(o) for o in self.world.objects],
             events=list(self._events),
         )

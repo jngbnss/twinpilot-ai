@@ -54,6 +54,7 @@ class GroundTruth:
     footprint_radius: float
     worker_distance: float
     payload_id: str | None
+    payload_mass: float
     objects: list[TaskObject]
     events: list[WorldEvent] = field(default_factory=list)
 

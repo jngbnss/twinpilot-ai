@@ -43,6 +43,19 @@ def front_pose(p: ExcavatorParams, boom: float, arm: float, bucket: float) -> Fr
     return FrontPose(p0, p1, p2, bc, p3, phi)
 
 
+def front_moment(
+    p: ExcavatorParams, boom: float, arm: float, bucket: float, payload: float
+) -> float:
+    """Horizontal moment (kg*m) of the front attachment about the swing center."""
+    fp = front_pose(p, boom, arm, bucket)
+    lk = p.links
+    return (
+        lk.boom.mass_kg * (fp.pivot.r + fp.boom_tip.r) / 2
+        + lk.arm.mass_kg * (fp.boom_tip.r + fp.arm_tip.r) / 2
+        + (lk.bucket.mass_kg + payload) * fp.bucket_center.r
+    )
+
+
 def to_world(
     pt: Point2, base_x: float, base_y: float, yaw: float, swing: float
 ) -> tuple[float, float, float]:

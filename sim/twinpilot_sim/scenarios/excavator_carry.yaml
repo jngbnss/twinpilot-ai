@@ -9,7 +9,7 @@ zone_a: {name: zone_a, x: -6.0, y: 2.0, radius: 2.5}
 zone_b: {name: zone_b, x: 6.0, y: 2.0, radius: 2.5}
 forbidden_zones:
   - {name: forbidden_north, xmin: -3.0, xmax: 3.0, ymin: 7.0, ymax: 11.0}
-worker: {x: 9.5, y: -5.0, radius: 0.4}
+worker: {x: 11.0, y: -7.0, radius: 0.4}
 drop_height_m: 2.5                   # release above this height counts as a drop
 objects:
   - {object_id: box_1, kind: box, mass_kg: 300.0, size_m: 0.8, x: -6.8, y: 1.4}
