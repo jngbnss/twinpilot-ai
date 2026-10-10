@@ -165,6 +165,6 @@ class AnomalyDetector(Protocol):                    # ai
 
 | ID | 작업 | 산출물 | 스모크 테스트 | 상태 | 비고 |
 |----|------|--------|---------------|------|------|
-| P5-1 | Xacro · 월드 SDF · Docker | ros2_ws/src/twinpilot_description, _gazebo | check_urdf, SDF 검사 | 대기 | |
-| P5-2 | ros2_control · bridge | _control, _bridge | headless 10 s, telemetry 수신 | 대기 | |
-| P5-3 | GazeboSource 연동 | backend telemetry | 대시보드 GAZEBO 모드 표시 | 대기 | |
+| P5-1 | Xacro · 월드 SDF · Docker | ros2_ws/src/twinpilot_description, _gazebo | check_urdf, SDF 검사 | 보류 | 선택 단계. ROS 2 Jazzy·Gazebo Docker 이미지(수 GB) 대비 디스크 여유 부족(약 1.7 GB) |
+| P5-2 | ros2_control · bridge | _control, _bridge | headless 10 s, telemetry 수신 | 보류 | 선택 단계. ROS 2 Jazzy·Gazebo Docker 이미지(수 GB) 대비 디스크 여유 부족(약 1.7 GB) |
+| P5-3 | GazeboSource 연동 | backend telemetry | 대시보드 GAZEBO 모드 표시 | 보류 | 선택 단계. ROS 2 Jazzy·Gazebo Docker 이미지(수 GB) 대비 디스크 여유 부족(약 1.7 GB) |

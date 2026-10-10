@@ -19,3 +19,4 @@
 | D-015 | 2026-10-11 | Isolation Forest를 NumPy로 직접 구현 (`twinpilot_ai.anomaly.iforest`), scikit-learn은 CI 동등성 테스트용 선택 의존성 | 개발 PC의 Smart App Control이 scikit-learn·SciPy·일부 numpy 확장 DLL을 버전 무관하게 차단 | 정책 해제, WSL에서 학습 |
 | D-016 | 2026-10-11 | 운영 모델은 val F1로 선정 (현재 Tail-normalized Z-score + residual 특징), IF는 비교 기준으로 유지 | 실험 1~2: IF가 FPR 1%에서 F1 0.03 이하, 고장이 소수 특징에 집중 | IF 운영 모델 |
 | D-017 | 2026-10-11 | 기본 포트 백엔드 8770, 프론트 5290 | 같은 PC의 다른 프로젝트들이 8000·8100·5173·5180 사용 중 | 8000/5173 |
+| D-018 | 2026-10-11 | `.gitignore`의 생성물 패턴은 루트 고정(`/runs/`, `/reports/`) | `runs/` 패턴이 `backend/app/runs/` 소스까지 무시해 커밋 누락 발생 | 디렉토리명 변경 |
