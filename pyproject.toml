@@ -3,19 +3,20 @@ name = "twinpilot-ai"
 version = "0.1.0"
 description = "Simulation-based digital twin prototype for excavator operation (Level 1)"
 requires-python = ">=3.12"
-dependencies = ["twinpilot-sim"]
+dependencies = ["twinpilot-sim", "twinpilot-backend"]
 
 [tool.uv]
 package = false
 
 [tool.uv.workspace]
-members = ["sim"]
+members = ["sim", "backend"]
 
 [tool.uv.sources]
 twinpilot-sim = { workspace = true }
+twinpilot-backend = { workspace = true }
 
 [dependency-groups]
-dev = ["pytest>=8", "ruff>=0.6"]
+dev = ["pytest>=8", "ruff>=0.6", "httpx>=0.27", "websockets>=12"]
 
 [tool.ruff]
 line-length = 100
@@ -26,8 +27,8 @@ extend-exclude = ["docs"]
 select = ["E", "F", "I", "B", "UP", "SIM"]
 
 [tool.pytest.ini_options]
-testpaths = ["sim/tests"]
-addopts = "-q"
+testpaths = ["sim/tests", "backend/tests"]
+addopts = "-q --import-mode=importlib"
 
 [tool.ruff.lint.isort]
 known-first-party = ["twinpilot_sim", "twinpilot_ai", "app"]

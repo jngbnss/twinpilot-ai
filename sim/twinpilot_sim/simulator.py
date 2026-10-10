@@ -25,6 +25,7 @@ EPOCH_NS = 1_760_140_800_000_000_000  # fixed offline epoch -> deterministic tim
 ROLLING_RESISTANCE = 0.1
 TILT_GAIN = 0.4
 HYDRAULIC_EFFICIENCY = 0.8
+OBJECT_STATE_CODE = {"resting": 0.0, "attached": 1.0, "delivered": 2.0}
 
 
 def offline_clock(sim_time: float) -> int:
@@ -362,6 +363,13 @@ class PythonSimulator:
         self._emit(out, "contact", "bucket_payload", 1.0 if self.world.payload else 0.0, Unit.BOOL)
         self._emit(out, "contact", "payload_mass", self._payload_mass(), Unit.KILOGRAM)
         self._emit(out, "task", "delivered", float(self.world.counters.delivered), Unit.COUNT)
+        # virtual object tracker (simulation ground truth) so replay can rebuild the scene
+        for o in self.world.objects:
+            src = f"obj_{o.object_id}"
+            self._emit(out, src, "pos_x", o.x, Unit.METER)
+            self._emit(out, src, "pos_y", o.y, Unit.METER)
+            self._emit(out, src, "pos_z", o.z, Unit.METER)
+            self._emit(out, src, "state", OBJECT_STATE_CODE[o.state], Unit.COUNT)
 
     # ----------------------------------------------------------- ground truth
     def ground_truth(self) -> GroundTruth:
