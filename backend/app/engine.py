@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import functools
 import json
+import threading
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -38,6 +40,17 @@ class EngineError(RuntimeError):
     pass
 
 
+def locked(fn):
+    """API handlers run in a thread pool while tick() runs on the event loop."""
+
+    @functools.wraps(fn)
+    def wrapper(self, *a, **kw):
+        with self._lock:
+            return fn(self, *a, **kw)
+
+    return wrapper
+
+
 class Engine:
     def __init__(self, settings: Settings, anomaly: AnomalyHook | None = None):
         self.settings = settings
@@ -53,6 +66,7 @@ class Engine:
         self._loop_task: asyncio.Task | None = None
         self._last_wall: float | None = None
         self._last_report: dict[str, Any] | None = None
+        self._lock = threading.RLock()
 
     # ------------------------------------------------------------- lifecycle
     async def start(self) -> None:
@@ -88,6 +102,7 @@ class Engine:
             q.put_nowait(msg)
 
     # ---------------------------------------------------------------- ticking
+    @locked
     def tick(self, wall_dt: float | None = None) -> Tick | None:
         now = time.perf_counter()
         if wall_dt is None:
@@ -127,6 +142,7 @@ class Engine:
         return {"level": last["level"], "rules": last["rules"], "estop": "estop" in last["rules"]}
 
     # ------------------------------------------------------------------ runs
+    @locked
     def start_live(
         self, seed: int = 1, autopilot: bool = False, faults: list[FaultSpec] | None = None
     ) -> str:
@@ -155,6 +171,7 @@ class Engine:
             self.inject(f)
         return run_id
 
+    @locked
     def start_replay(self, run_id: str) -> str:
         path = self.index.path(run_id)
         if path is None:
@@ -178,6 +195,7 @@ class Engine:
         if self.anomaly is not None:
             self.anomaly.reset(src.run_id)
 
+    @locked
     def stop_run(self) -> dict[str, Any] | None:
         if self.source is None:
             return None
@@ -198,15 +216,19 @@ class Engine:
             raise EngineError("no live run")
         return self.source
 
+    @locked
     def submit(self, cmd: ControlCommand) -> bool:
         return self._live().submit(cmd)
 
+    @locked
     def estop(self) -> None:
         self._live().session.safety.trigger_estop()
 
+    @locked
     def reset_estop(self) -> None:
         self._live().session.safety.reset_estop()
 
+    @locked
     def inject(self, fault: FaultSpec) -> dict[str, Any]:
         src = self._live()
         if fault.start_time < src.sim_time:
@@ -225,6 +247,7 @@ class Engine:
         return self.source
 
     # ---------------------------------------------------------------- views
+    @locked
     def snapshot(self) -> dict[str, Any]:
         if self.store is None:
             return {"run_id": None, "mode": "idle"}

@@ -34,6 +34,12 @@ uv run python -m twinpilot_sim run --seed 1 --duration 120
 uv run python -m twinpilot_sim run --seed 1 --duration 120   --fault simulation/fault-scenarios/joint_lag_bucket.yaml --parquet
 ```
 
+```bash
+# 백엔드 (http://127.0.0.1:8000/docs)
+uv run python -m uvicorn app.main:app --app-dir backend --port 8000
+uv run python scripts/ws_smoke.py   # 다른 터미널에서 E2E 스모크
+```
+
 > Windows 애플리케이션 제어 정책이 uv가 만든 `.exe` 진입점을 차단할 수 있어 `python -m` 형식을 쓴다.
 
 ## 범위 밖
