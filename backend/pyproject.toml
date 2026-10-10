@@ -5,6 +5,7 @@ description = "TwinPilot backend: telemetry collection, twin state store, safety
 requires-python = ">=3.12"
 dependencies = [
     "twinpilot-sim",
+    "twinpilot-ai",
     "fastapi>=0.115",
     "uvicorn[standard]>=0.30",
     "pydantic-settings>=2.4",
@@ -12,6 +13,7 @@ dependencies = [
 
 [tool.uv.sources]
 twinpilot-sim = { workspace = true }
+twinpilot-ai = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]

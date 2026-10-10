@@ -1,0 +1,24 @@
+[project]
+name = "twinpilot-ai"
+version = "0.1.0"
+description = "Feature extraction, anomaly detection and evaluation for TwinPilot telemetry"
+requires-python = ">=3.12"
+dependencies = [
+    "twinpilot-sim",
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "pyarrow>=16",
+    "scikit-learn>=1.5",
+    "joblib>=1.4",
+    "pyyaml>=6",
+]
+
+[tool.uv.sources]
+twinpilot-sim = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["twinpilot_ai"]

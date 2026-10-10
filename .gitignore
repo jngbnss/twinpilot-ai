@@ -16,6 +16,7 @@ reports/
 datasets/normal/
 datasets/injected-faults/
 datasets/raw/
+datasets/v*/
 ai/models/
 *.parquet
 *.onnx
