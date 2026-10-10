@@ -12,10 +12,10 @@ const api = (path, body) =>
     body: body === undefined ? undefined : JSON.stringify(body),
   }).then((r) => r.json());
 
-const browser = await chromium.launch({ channel: "msedge", headless: true, args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
+const browser = await chromium.launch({ channel: "msedge", headless: true, args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--disk-cache-size=1", "--disable-gpu-shader-disk-cache", "--disable-breakpad"] });
 const page = await browser.newPage({ viewport: { width: 1500, height: 1000 } });
 const errors = [];
-page.on("pageerror", (e) => errors.push(String(e)));
+page.on("pageerror", (e) => errors.push(`${e} @ ${String(e.stack ?? "").split(/\r?\n/).slice(1, 4).join(" <- ")}`));
 const check = (cond, label) => {
   console.log((cond ? "PASS " : "FAIL ") + label);
   if (!cond) process.exitCode = 1;
@@ -67,13 +67,15 @@ await page.getByRole("button", { name: "조종" }).click();
 await page.getByText("종료").click();
 await sleep(1500);
 await page.getByRole("button", { name: "분석 · 리플레이" }).click();
-const hasAnalysis = await page.getByText("성과 보고서").first().isVisible().catch(() => false);
-if (hasAnalysis) {
+await page.locator("[data-testid=run-row]").first().waitFor({ timeout: 10000 });
+{
   await page.locator("[data-testid=run-row]").first().click();
+  await page.getByText("성과 보고서").waitFor({ timeout: 10000 });
+  check(await page.getByText("고장 → 첫 경보").isVisible(), "report shows score, raw metrics and fault->alarm time");
   await sleep(1500);
-  await page.getByText("리플레이 열기").click();
+  await page.getByRole("button", { name: "리플레이 열기" }).click();
   await sleep(1000);
-  await page.getByText("재생").click();
+  await page.getByRole("button", { name: "재생", exact: true }).click();
   await sleep(4000);
   const st = await api("/api/twin/state");
   check(st.mode === "replay" && st.replay.cursor > 1, `replay playing (cursor ${st.replay?.cursor})`);

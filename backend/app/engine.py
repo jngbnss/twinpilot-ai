@@ -10,6 +10,7 @@ import asyncio
 import contextlib
 import functools
 import json
+import logging
 import threading
 import time
 from datetime import UTC, datetime
@@ -26,6 +27,8 @@ from twinpilot_sim.params import default_params
 from twinpilot_sim.recorder import RunRecorder, read_events, read_meta
 from twinpilot_sim.schema import ControlCommand, FaultSpec, RunMetadata
 from twinpilot_sim.world import load_task
+
+log = logging.getLogger("twinpilot.engine")
 
 
 class AnomalyHook(Protocol):
@@ -67,6 +70,7 @@ class Engine:
         self._last_wall: float | None = None
         self._last_report: dict[str, Any] | None = None
         self._lock = threading.RLock()
+        self.last_error: str | None = None
 
     # ------------------------------------------------------------- lifecycle
     async def start(self) -> None:
@@ -87,7 +91,11 @@ class Engine:
         every = max(1, round(self.settings.tick_hz / self.settings.broadcast_hz))
         n = 0
         while True:
-            self.tick()
+            try:
+                self.tick()
+            except Exception as e:  # noqa: BLE001 - keep the loop alive, surface the error
+                log.exception("tick failed")
+                self.last_error = f"{type(e).__name__}: {e}"
             n += 1
             if n % every == 0 and self.subscribers and self.store is not None:
                 self._broadcast()
@@ -260,6 +268,8 @@ class Engine:
                 "playing": self.source.playing,
             }
         snap["active"] = self.source is not None
+        if self.last_error:
+            snap["engine_error"] = self.last_error
         snap["autopilot"] = (
             isinstance(self.source, LiveSimSource) and self.source.operator is not None
         )

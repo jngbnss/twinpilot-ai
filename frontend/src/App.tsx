@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { TopBar } from "./components/TopBar";
 import { AIView } from "./features/anomalies/AIView";
 import { ControlView } from "./features/control/ControlView";
+import { AnalysisView } from "./features/replay/AnalysisView";
 import { StatusView } from "./features/telemetry/StatusView";
 import { api } from "./services/api";
 import { TwinSocket, wsUrl } from "./services/ws";
@@ -48,7 +49,7 @@ export default function App() {
         {tab === "control" && <ControlView />}
         {tab === "status" && <StatusView />}
         {tab === "ai" && <AIView />}
-        {tab === "analysis" && <div className="panel">준비 중</div>}
+        {tab === "analysis" && <AnalysisView />}
       </main>
     </div>
   );

@@ -69,3 +69,18 @@ API 핸들러는 스레드풀, tick 루프는 이벤트 루프에서 돌기 때�
 uv run python -m twinpilot_ai.training.make_dataset --version v1 --workers 10   # 약 2분
 uv run python -m twinpilot_ai.evaluation.evaluate                                 # 약 2분, 모델 저장
 ```
+
+## Phase 4 — `frontend/`
+
+| 모듈 | 역할 |
+|------|------|
+| `services/api.ts`, `services/ws.ts` | REST 클라이언트, `/ws/twin` 재연결·지연 측정 |
+| `store/useTwin.ts` | zustand — 최신 스냅샷, 150 s 샘플 버퍼 (run 변경·리플레이 되감기 시 초기화) |
+| `features/control/` | 키보드·게임패드 → ControlCommand 20 Hz (입력 있을 때만 전송, 포커스 이탈 시 해제), 조종 화면 |
+| `components/Scene3D.tsx` | three.js 로우폴리 굴착기 (관절 계층), 구역·운반물·작업자 안전 반경 |
+| `features/telemetry/StatusView.tsx` | 관절·IMU·가상 장비 상태, 시간 동기화 지표 |
+| `features/anomalies/AIView.tsx` | 이상 점수 타임라인(탐지기별, 임계값 = 1), 규칙 vs 모델, 구간 비교 |
+| `features/replay/AnalysisView.tsx` | run 목록, 보고서(JSON/Markdown), 리플레이 제어, 이벤트 마커 그래프 |
+| `e2e/ui-smoke.mjs` | 시스템 Edge로 데모 4단계 자동 확인 |
+
+Vite 개발 서버(5290)가 `/api`, `/ws`를 백엔드(8770)로 프록시한다.
