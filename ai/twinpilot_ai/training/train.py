@@ -6,7 +6,6 @@ uv run python -m twinpilot_ai.training.train --manifest datasets/manifests/v1.ya
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import numpy as np
@@ -15,7 +14,7 @@ from twinpilot_ai.anomaly.detectors import (
     DETECTORS,
     DetectorBundle,
 )
-from twinpilot_ai.features.dataset import RunWindows, window_run
+from twinpilot_ai.features.dataset import RunWindows, window_run_multi
 from twinpilot_ai.training.make_dataset import load_manifest, run_dir_for
 
 TARGET_FPR = 0.01
@@ -25,16 +24,24 @@ DEFAULT_MODEL = Path("ai/models/detector-v1.joblib")
 def load_split(
     manifest_path: Path | str, splits: tuple[str, ...], feature_set: str = "full"
 ) -> list[RunWindows]:
+    return load_splits(manifest_path, splits, (feature_set,))[feature_set]
+
+
+def load_splits(
+    manifest_path: Path | str, splits: tuple[str, ...], feature_sets: tuple[str, ...]
+) -> dict[str, list[RunWindows]]:
+    """Sequential read (pyarrow + threads segfaulted on Windows); one read per run."""
     m = load_manifest(manifest_path)
-    rows = [r for r in m["runs"] if r["split"] in splits]
-
-    def one(r: dict) -> RunWindows:
-        rw = window_run(run_dir_for(manifest_path, r["run_id"]), r["faults"], feature_set)
-        rw.run_id = r["run_id"]
-        return rw
-
-    with ThreadPoolExecutor(max_workers=8) as ex:
-        return list(ex.map(one, rows))
+    out: dict[str, list[RunWindows]] = {fs: [] for fs in feature_sets}
+    for r in m["runs"]:
+        if r["split"] not in splits:
+            continue
+        multi = window_run_multi(
+            run_dir_for(manifest_path, r["run_id"]), r["faults"], feature_sets, run_id=r["run_id"]
+        )
+        for fs in feature_sets:
+            out[fs].append(multi[fs])
+    return out
 
 
 def stack(runs: list[RunWindows], normal_only: bool = False) -> np.ndarray:

@@ -83,10 +83,14 @@ class ThresholdDetector(Detector):
 
     def _fit(self, X: np.ndarray) -> None:
         names = self.feature_names
-        self._max_idx = np.array([i for i, n in enumerate(names) if n.endswith(":max")])
-        self._min_idx = np.array(
-            [names.index(names[i].replace(":max", ":min")) for i in self._max_idx]
-        )
+        mx = [i for i, n in enumerate(names) if n.endswith(":max")]
+        if mx:
+            self._max_idx = np.array(mx, dtype=int)
+            self._min_idx = np.array(
+                [names.index(names[i].replace(":max", ":min")) for i in mx], dtype=int
+            )
+        else:  # feature sets without min/max: limit every feature on both sides
+            self._max_idx = self._min_idx = np.arange(len(names), dtype=int)
         self.hi = np.quantile(X[:, self._max_idx], self.q, axis=0)
         self.lo = np.quantile(X[:, self._min_idx], 1 - self.q, axis=0)
         self.span = np.maximum(self.hi - self.lo, STD_FLOOR)
@@ -124,6 +128,42 @@ class ZScoreDetector(Detector):
         return np.abs(self.zscores(X)).max(axis=1)
 
 
+class TailZDetector(Detector):
+    """Z-score normalized per feature by its own normal tail (p99.9 of |z|).
+
+    Plain max-|z| is dominated by heavy-tailed features; dividing each |z| by that
+    feature's normal tail makes every feature equally likely to fire on normal data.
+    """
+
+    name = "zscore-tail"
+    version = "1"
+
+    def __init__(self, q: float = 0.999):
+        super().__init__()
+        self.q = q
+        self.threshold = 1.0
+
+    def _fit(self, X: np.ndarray) -> None:
+        self.tail = np.maximum(np.quantile(np.abs(self.zscores(X)), self.q, axis=0), 1.0)
+
+    def normalized(self, X: np.ndarray) -> np.ndarray:
+        return np.abs(self.zscores(X)) / self.tail
+
+    def score(self, X: np.ndarray) -> np.ndarray:
+        return self.normalized(X).max(axis=1)
+
+    def explain(self, x: np.ndarray, k: int = 3) -> list[str]:
+        z = self.normalized(x.reshape(1, -1))[0]
+        out: list[str] = []
+        for i in np.argsort(-z):
+            s = sensor_of(self.feature_names[i])
+            if s not in out:
+                out.append(s)
+            if len(out) == k:
+                break
+        return out
+
+
 class IsolationForestDetector(Detector):
     name = "isolation-forest"
     version = "1"
@@ -150,6 +190,7 @@ class IsolationForestDetector(Detector):
 DETECTORS = {
     "threshold": ThresholdDetector,
     "zscore": ZScoreDetector,
+    "zscore-tail": TailZDetector,
     "isolation-forest": IsolationForestDetector,
 }
 

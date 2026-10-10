@@ -4,6 +4,7 @@ import pytest
 from twinpilot_ai.anomaly.detectors import (
     DetectorBundle,
     IsolationForestDetector,
+    TailZDetector,
     ThresholdDetector,
     ZScoreDetector,
 )
@@ -31,7 +32,9 @@ def anomalies(n=50):
     return X
 
 
-@pytest.mark.parametrize("cls", [ThresholdDetector, ZScoreDetector, IsolationForestDetector])
+@pytest.mark.parametrize(
+    "cls", [ThresholdDetector, ZScoreDetector, TailZDetector, IsolationForestDetector]
+)
 def test_detector_separates_shifted_windows(cls):
     det = cls().fit(data(), NAMES)
     det.calibrate(data(400, seed=1), fpr=0.01)

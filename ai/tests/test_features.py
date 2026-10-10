@@ -36,7 +36,7 @@ def test_feature_sets_shapes_and_names(fs):
 def test_feature_sets_are_nested():
     fast, slow = windows()
     prev: set[str] = set()
-    for fs in FEATURE_SETS:
+    for fs in FEATURE_SETS[:4]:  # "residual" is a compact, separate set
         names = set(features_batch(fast, slow, fs)[1])
         assert prev <= names
         prev = names
@@ -67,3 +67,13 @@ def test_known_values():
     # position moved 1 rad with zero velocity reported -> kinematic residual 1
     assert f["boom_joint.position:kin_residual"] == pytest.approx(1.0)
     assert sensor_of("boom_joint.position:kin_residual") == "boom_joint.position"
+
+
+def test_residual_set_flags_stuck_and_lag():
+    fast, slow = windows(2, seed=3)
+    i = FAST_CHANNELS.index("imu.roll")
+    fast[1, :, i] = 0.123  # stuck sensor in window 1
+    X, names = features_batch(fast, slow, "residual")
+    f = names.index("imu.roll:flat")
+    assert X[0, f] == 0.0 and X[1, f] == 1.0
+    assert not any(n.endswith(":mean") and "twin" not in n for n in names)

@@ -56,13 +56,14 @@ def load_arrays(run_dir: Path) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.n
     return tf, F, ts, S
 
 
-def window_run(
+def window_run_multi(
     run_dir: Path,
     faults: list[dict],
-    feature_set: str = "full",
+    feature_sets: tuple[str, ...] = ("full",),
     spec: WindowSpec = DEFAULT_SPEC,
     run_id: str | None = None,
-) -> RunWindows:
+) -> dict[str, RunWindows]:
+    """Read a run once and compute several feature sets on identical windows."""
     tf, F, ts, S = load_arrays(run_dir)
     nf, ns = spec.n_fast, spec.n_slow
     fast_w = sliding_window_view(F, nf, axis=0).transpose(0, 2, 1)  # (N-nf+1, nf, C)
@@ -72,7 +73,7 @@ def window_run(
     si = np.searchsorted(ts, t_ends + 1e-9) - ns
     ok = (fi >= 0) & (si >= 0) & (fi < len(fast_w)) & (si < len(slow_w))
     t_ends, fi, si = t_ends[ok], fi[ok], si[ok]
-    X, names = features_batch(fast_w[fi], slow_w[si], feature_set, spec)
+    fast_sel, slow_sel = fast_w[fi], slow_w[si]
 
     y = np.zeros(len(t_ends), dtype=int)
     ignore = np.zeros(len(t_ends), dtype=bool)
@@ -89,7 +90,23 @@ def window_run(
         partial = (overlap > 0) & ~hit
         grace = (t_starts >= b) & (t_starts < b + POST_FAULT_GRACE_S)
         ignore |= (partial | grace) & (y == 0)
-    return RunWindows(run_id or run_dir.name, X, t_ends, y, ignore, ftype, sev, names, faults)
+    out = {}
+    for fs in feature_sets:
+        X, names = features_batch(fast_sel, slow_sel, fs, spec)
+        out[fs] = RunWindows(
+            run_id or run_dir.name, X, t_ends, y, ignore, ftype, sev, names, faults
+        )
+    return out
+
+
+def window_run(
+    run_dir: Path,
+    faults: list[dict],
+    feature_set: str = "full",
+    spec: WindowSpec = DEFAULT_SPEC,
+    run_id: str | None = None,
+) -> RunWindows:
+    return window_run_multi(run_dir, faults, (feature_set,), spec, run_id)[feature_set]
 
 
 def windows_frame(runs: list[RunWindows]) -> pd.DataFrame:
