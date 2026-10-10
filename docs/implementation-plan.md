@@ -128,7 +128,7 @@ class AnomalyDetector(Protocol):                    # ai
 |----|------|--------|---------------|------|------|
 | P1-1 | 저장소 골격 · uv workspace · 기본 docs · CI | pyproject, .gitignore, README, LICENSE, ci.yml, docs/* | `uv run ruff check . && uv run pytest` | 완료 | ruff·format·pytest 통과 (1 passed) |
 | P1-2 | Telemetry 스키마 · 단위 · 파라미터 | schema.py, units.py, excavator.yaml | 스키마 테스트 (단위 누락·잘못된 quality 거부) | 완료 | 스키마·파라미터 테스트 14 passed |
-| P1-3 | 시뮬레이터 (동역학 · 센서 · 월드 · attach) | kinematics, world, simulator | 10 s 실행 → 전 센서 레코드 생성, 한계 내 관절 | 대기 | |
+| P1-3 | 시뮬레이터 (동역학 · 센서 · 월드 · attach) | kinematics, world, simulator | 10 s 실행 → 전 센서 레코드 생성, 한계 내 관절 | 진행중 |  |
 | P1-4 | Control Mapper · Safety Layer | control/mapper.py, safety.py | 한계·변화율·타임아웃·E-stop·작업자·금지구역·경계 테스트 | 대기 | |
 | P1-5 | Fault Injection · Scripted Operator | faults.py, operator.py, fault-scenarios/*.yaml | seed 1~3 운반 3개 완료, fault 5종 신호 변화 | 대기 | |
 | P1-6 | Recorder · CLI · 결정성 | recorder.py, cli.py | CLI 정상+JOINT_LAG run 생성, 동일 seed 해시 일치 | 대기 | |
