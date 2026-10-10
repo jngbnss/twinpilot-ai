@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Node
+node_modules/
+frontend/dist/
+
+# 생성물 (git 제외)
+runs/
+reports/
+datasets/normal/
+datasets/injected-faults/
+datasets/raw/
+ai/models/
+*.parquet
+*.onnx
+*.joblib
+!tests/fixtures/**/*.joblib
+!**/tests/fixtures/**/*.joblib
+*.db
+*.sqlite
+
+# 환경
+.env
+.idea/
+.vscode/
