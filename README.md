@@ -28,7 +28,13 @@
 uv sync --all-packages
 uv run ruff check .
 uv run pytest
+
+# 시나리오 실행 (정상 / 고장 주입)
+uv run python -m twinpilot_sim run --seed 1 --duration 120
+uv run python -m twinpilot_sim run --seed 1 --duration 120   --fault simulation/fault-scenarios/joint_lag_bucket.yaml --parquet
 ```
+
+> Windows 애플리케이션 제어 정책이 uv가 만든 `.exe` 진입점을 차단할 수 있어 `python -m` 형식을 쓴다.
 
 ## 범위 밖
 

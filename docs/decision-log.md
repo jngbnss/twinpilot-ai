@@ -15,3 +15,4 @@
 | D-011 | 2026-10-11 | 단위 표기는 ASCII (`Nm`, `degC`, `m/s^2`) | 파일·URL·CSV 호환 | 유니코드 기호 |
 | D-012 | 2026-10-11 | 물리 50 Hz, 고속 센서 25 Hz, 저속 센서 5 Hz | 120 s run 레코드 수를 약 10만으로 제한(데이터셋 용량) | 센서 50/10 Hz |
 | D-013 | 2026-10-11 | 기본 작업 시나리오는 패키지 내부 `twinpilot_sim/scenarios/`, 변형은 `simulation/tasks/` | 설치 위치와 무관하게 로드 | 저장소 경로 고정 |
+| D-014 | 2026-10-11 | CLI·서버는 `python -m` 으로 실행 | 로컬 Windows 애플리케이션 제어 정책이 uv 생성 `.exe` 진입점 차단 (os error 4551) | console script exe |

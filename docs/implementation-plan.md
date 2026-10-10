@@ -131,7 +131,7 @@ class AnomalyDetector(Protocol):                    # ai
 | P1-3 | 시뮬레이터 (동역학 · 센서 · 월드 · attach) | kinematics, world, simulator | 10 s 실행 → 전 센서 레코드 생성, 한계 내 관절 | 완료 | 10 s 실행 전 센서 25/5 Hz·관절 한계·attach/deliver 테스트 통과 (22 passed) |
 | P1-4 | Control Mapper · Safety Layer | control/mapper.py, safety.py | 한계·변화율·타임아웃·E-stop·작업자·금지구역·경계 테스트 | 완료 | 매퍼·안전 규칙 12종·AI import 금지 테스트 통과 (34 passed) |
 | P1-5 | Fault Injection · Scripted Operator | faults.py, operator.py, fault-scenarios/*.yaml | seed 1~3 운반 3개 완료, fault 5종 신호 변화 | 완료 | seed 1~3 운반 3개 완료(약 47 s), fault 5종 신호 변화 확인 (44 passed) |
-| P1-6 | Recorder · CLI · 결정성 | recorder.py, cli.py | CLI 정상+JOINT_LAG run 생성, 동일 seed 해시 일치 | 진행중 |  |
+| P1-6 | Recorder · CLI · 결정성 | recorder.py, cli.py | CLI 정상+JOINT_LAG run 생성, 동일 seed 해시 일치 | 완료 | CLI 정상·JOINT_LAG 120 s run 생성(각 103,200 레코드), 재실행 sha256 일치 (47 passed) |
 
 ### Phase 2 — Backend · Twin (`prompts/phase-2-backend-twin.md`)
 
