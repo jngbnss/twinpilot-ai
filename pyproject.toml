@@ -28,3 +28,6 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 [tool.pytest.ini_options]
 testpaths = ["sim/tests"]
 addopts = "-q"
+
+[tool.ruff.lint.isort]
+known-first-party = ["twinpilot_sim", "twinpilot_ai", "app"]

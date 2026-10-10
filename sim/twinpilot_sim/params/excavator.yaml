@@ -1,0 +1,95 @@
+# 20 t class hydraulic excavator - approximate values.
+# Sources and assumptions: docs/simulation-assumptions.md. Not a model of any specific product.
+
+body:
+  mass_kg: 20000.0
+  track_gauge_m: 2.4          # left-right track center distance
+  max_track_speed_mps: 1.5    # about 5.4 km/h
+  track_time_constant_s: 0.4
+  cg_height_m: 1.1
+  half_track_length_m: 1.8    # support polygon half length (pitch)
+  half_track_width_m: 1.5     # support polygon half width (roll)
+  footprint_radius_m: 2.8     # collision radius of the machine body
+
+boom_pivot:                   # boom pivot relative to swing center, upper-body frame
+  x_m: 0.5
+  z_m: 2.0
+
+links:
+  boom:   {length_m: 5.7, mass_kg: 1800.0}
+  arm:    {length_m: 2.9, mass_kg: 900.0}
+  bucket: {length_m: 1.4, mass_kg: 800.0}
+
+joints:
+  swing_joint:
+    type: continuous
+    max_velocity_rps: 1.0
+    time_constant_s: 0.35
+    viscous_friction: 4000.0     # Nm per rad/s
+    inertia_kgm2: 60000.0
+    initial_rad: 0.0
+  boom_joint:
+    type: revolute
+    lower_rad: -0.5
+    upper_rad: 1.2
+    max_velocity_rps: 0.45
+    time_constant_s: 0.25
+    viscous_friction: 6000.0
+    initial_rad: 0.6
+  arm_joint:
+    type: revolute
+    lower_rad: -2.6
+    upper_rad: -0.5
+    max_velocity_rps: 0.6
+    time_constant_s: 0.2
+    viscous_friction: 3000.0
+    initial_rad: -1.6
+  bucket_joint:
+    type: revolute
+    lower_rad: -1.0             # open
+    upper_rad: 1.8              # fully curled (closed)
+    max_velocity_rps: 1.0
+    time_constant_s: 0.15
+    viscous_friction: 1200.0
+    initial_rad: 0.0
+
+grasp:
+  attach_radius_m: 1.0          # bucket tip to object center
+  close_threshold_rad: 0.9      # bucket angle crossing upward -> attach
+  release_threshold_rad: 0.4    # bucket angle below -> detach
+
+hydraulic:
+  ambient_c: 25.0
+  initial_c: 45.0
+  heat_per_kw: 0.0012           # degC/s per kW hydraulic power
+  base_heat_cps: 0.01           # idle heating degC/s
+  cooling_coeff: 0.004          # 1/s towards ambient
+
+engine:
+  rated_power_kw: 110.0
+  idle_power_kw: 12.0
+
+vibration:
+  base_rms: 0.15                # m/s^2 at idle
+  per_kw: 0.006
+
+sensors:                        # sample rates (Hz) and noise std
+  fast_rate_hz: 50
+  slow_rate_hz: 10
+  noise:
+    position_rad: 0.0005
+    velocity_rps: 0.002
+    effort_nm: 150.0
+    imu_angle_rad: 0.0008
+    imu_rate_rps: 0.002
+    accel_mps2: 0.03
+    temperature_c: 0.05
+    pose_m: 0.01
+
+safety:
+  max_roll_rad: 0.20
+  max_pitch_rad: 0.25
+  worker_min_distance_m: 5.0
+  command_timeout_s: 0.5
+  max_axis_rate_per_s: 4.0      # normalized axis change per second
+  limit_margin_rad: 0.02
