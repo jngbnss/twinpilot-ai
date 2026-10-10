@@ -137,7 +137,7 @@ class AnomalyDetector(Protocol):                    # ai
 
 | ID | 작업 | 산출물 | 스모크 테스트 | 상태 | 비고 |
 |----|------|--------|---------------|------|------|
-| P2-1 | FastAPI 골격 · TelemetrySource (Live/Replay) | app/main.py, telemetry/ | Live·Replay 동일 필드 집합, seek 일치 | 대기 | |
+| P2-1 | FastAPI 골격 · TelemetrySource (Live/Replay) | app/main.py, telemetry/ | Live·Replay 동일 필드 집합, seek 일치 | 진행중 |  |
 | P2-2 | Twin State Store · 시간 지표 | twin/store.py | 역순 정렬·stale·누락 카운트 테스트 | 대기 | |
 | P2-3 | Safety 연동 · 작업 평가 · Run 관리 | safety/, tasks/, runs/ | fixture run 지표 검증, 타임아웃 정지 | 대기 | |
 | P2-4 | REST · WebSocket · 스모크 스크립트 | api/, scripts/ws_smoke.py | 서버 기동 → run → 제어 → WS → 리포트 → replay | 대기 | |
