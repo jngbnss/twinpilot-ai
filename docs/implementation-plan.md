@@ -139,7 +139,7 @@ class AnomalyDetector(Protocol):                    # ai
 |----|------|--------|---------------|------|------|
 | P2-1 | FastAPI 골격 · TelemetrySource (Live/Replay) | app/main.py, telemetry/ | Live·Replay 동일 필드 집합, seek 일치 | 완료 | Live·Replay 동일 상태 구조, seek 값 일치, 배속·정지 테스트 통과 (4 passed) |
 | P2-2 | Twin State Store · 시간 지표 | twin/store.py | 역순 정렬·stale·누락 카운트 테스트 | 완료 | sim time 정렬·늦은 레코드·누락·stale·지연 측정 테스트 통과 (10 passed) |
-| P2-3 | Safety 연동 · 작업 평가 · Run 관리 | safety/, tasks/, runs/ | fixture run 지표 검증, 타임아웃 정지 | 대기 | |
+| P2-3 | Safety 연동 · 작업 평가 · Run 관리 | safety/, tasks/, runs/ | fixture run 지표 검증, 타임아웃 정지 | 진행중 |  |
 | P2-4 | REST · WebSocket · 스모크 스크립트 | api/, scripts/ws_smoke.py | 서버 기동 → run → 제어 → WS → 리포트 → replay | 대기 | |
 
 ### Phase 3 — 이상 탐지 (`prompts/phase-3-anomaly-ai.md`)
