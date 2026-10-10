@@ -1,0 +1,2 @@
+faults:
+  - {fault_id: fault-001, type: JOINT_LAG, target: bucket_joint, start_time: 20.0, duration: 15.0, severity: 0.6}

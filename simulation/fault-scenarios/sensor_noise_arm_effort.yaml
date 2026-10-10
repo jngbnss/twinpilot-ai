@@ -1,0 +1,2 @@
+faults:
+  - {fault_id: fault-003, type: SENSOR_NOISE, target: arm_joint.effort, start_time: 20.0, duration: 15.0, severity: 0.6}

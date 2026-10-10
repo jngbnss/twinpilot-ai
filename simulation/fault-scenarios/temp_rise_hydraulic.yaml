@@ -1,0 +1,2 @@
+faults:
+  - {fault_id: fault-005, type: TEMP_RISE, target: hydraulic, start_time: 20.0, duration: 25.0, severity: 0.6}

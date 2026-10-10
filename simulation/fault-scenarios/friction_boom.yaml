@@ -1,0 +1,2 @@
+faults:
+  - {fault_id: fault-002, type: FRICTION_INCREASE, target: boom_joint, start_time: 20.0, duration: 20.0, severity: 0.6}
