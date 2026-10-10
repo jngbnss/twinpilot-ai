@@ -215,6 +215,8 @@ class Engine:
             report = self.report_for(self.source.run_id)
             self.recorder = None
         self._last_report = report
+        if isinstance(self.source, ReplaySource):
+            self.store = None  # closing a replay returns the dashboard to idle
         self.source = None
         return report
 
