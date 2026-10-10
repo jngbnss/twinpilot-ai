@@ -146,7 +146,7 @@ class AnomalyDetector(Protocol):                    # ai
 
 | ID | 작업 | 산출물 | 스모크 테스트 | 상태 | 비고 |
 |----|------|--------|---------------|------|------|
-| P3-1 | 데이터셋 생성 · 매니페스트 · run 단위 분할 | training/make_dataset.py, manifests/v1.yaml | 생성 완료, 분할 누수 테스트 | 대기 | |
+| P3-1 | 데이터셋 생성 · 매니페스트 · run 단위 분할 | training/make_dataset.py, manifests/v1.yaml | 생성 완료, 분할 누수 테스트 | 진행중 |  |
 | P3-2 | 특징량 | features/ | 결정성·창 경계 테스트 | 대기 | |
 | P3-3 | 탐지기 3종 (Threshold · Z-score · IF) | anomaly/ | fixture 학습·추론 | 대기 | |
 | P3-4 | 평가 · 실험 1~3 기록 | evaluation/, reports/eval-v1.md, experiments.md | twinpilot-eval 실행, 표 생성 | 대기 | |
