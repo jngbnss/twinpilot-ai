@@ -156,7 +156,7 @@ class AnomalyDetector(Protocol):                    # ai
 
 | ID | 작업 | 산출물 | 스모크 테스트 | 상태 | 비고 |
 |----|------|--------|---------------|------|------|
-| P4-1 | Vite 골격 · 서비스 · store · 타입 · CI | frontend/ | typecheck · test · build | 진행중 |  |
+| P4-1 | Vite 골격 · 서비스 · store · 타입 · CI | frontend/ | typecheck · test · build | 완료 | Vite+React+TS 골격·REST/WS 서비스·zustand store·타입, typecheck·vitest 3 passed·build 통과, CI frontend job 추가 |
 | P4-2 | 조종 입력 · 3D 뷰 | features/control, 3D 씬 | 키 매핑 테스트, 브라우저 조종 반영 | 대기 | |
 | P4-3 | 상태 · AI 화면 · Fault 패널 | features/telemetry, anomalies | fault 주입 → 점수 그래프 상승 | 대기 | |
 | P4-4 | 분석 · 리플레이 · 보고서 · README | features/replay, tasks | 데모 4단계 실제 수행 | 대기 | |
