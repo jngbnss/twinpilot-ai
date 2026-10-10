@@ -51,14 +51,14 @@ base_link (트랙 프레임)
 
 | source | metric | unit | Hz |
 |--------|--------|------|----|
-| `<joint>` | position / velocity / effort / command / command_error | rad, rad/s, N·m, rad/s, rad/s | 50 |
-| `left_track`,`right_track` | velocity | m/s | 50 |
-| `imu` | roll, pitch, yaw / angular_velocity_z / linear_accel_x,y,z | rad, rad/s, m/s² | 50 |
-| `base` | pose_x, pose_y | m | 50 |
-| `hydraulic` | oil_temperature | °C | 10 |
-| `engine` | load | % | 10 |
-| `chassis` | vibration_rms | m/s² | 10 |
-| `energy` | consumed | kJ | 10 |
+| `<joint>` | position / velocity / effort / command / command_error | rad, rad/s, N·m, rad/s, rad/s | 25 |
+| `left_track`,`right_track` | velocity | m/s | 25 |
+| `imu` | roll, pitch, yaw / angular_velocity_z / linear_accel_x,y,z | rad, rad/s, m/s² | 25 |
+| `base` | pose_x, pose_y | m | 25 |
+| `hydraulic` | oil_temperature | °C | 5 |
+| `engine` | load | % | 5 |
+| `chassis` | vibration_rms | m/s² | 5 |
+| `energy` | consumed | kJ | 5 |
 | `contact` | bucket_payload / collision | bool(0/1) | event |
 
 전부 `quality: "simulated"`.

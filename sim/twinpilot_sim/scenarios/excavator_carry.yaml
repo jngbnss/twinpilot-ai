@@ -1,0 +1,17 @@
+# MVP task: carry 3 objects from zone A to zone B.
+# World frame: x east, y north, meters. Machine starts facing +y (yaw = pi/2).
+name: excavator_carry
+time_limit_s: 300.0
+target_count: 3
+start_pose: {x: 0.0, y: -6.0, yaw: 1.5707963}
+work_position: {x: 0.0, y: 0.0}      # hint for scripted operator
+zone_a: {name: zone_a, x: -6.0, y: 2.0, radius: 2.5}
+zone_b: {name: zone_b, x: 6.0, y: 2.0, radius: 2.5}
+forbidden_zones:
+  - {name: forbidden_north, xmin: -3.0, xmax: 3.0, ymin: 7.0, ymax: 11.0}
+worker: {x: 9.5, y: -5.0, radius: 0.4}
+drop_height_m: 2.5                   # release above this height counts as a drop
+objects:
+  - {object_id: box_1, kind: box, mass_kg: 300.0, size_m: 0.8, x: -6.8, y: 1.4}
+  - {object_id: rock_1, kind: rock, mass_kg: 450.0, size_m: 0.8, x: -5.3, y: 1.9}
+  - {object_id: soil_1, kind: soil_block, mass_kg: 600.0, size_m: 0.8, x: -6.3, y: 3.1}

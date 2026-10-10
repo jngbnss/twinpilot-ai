@@ -61,8 +61,8 @@ grasp:
 hydraulic:
   ambient_c: 25.0
   initial_c: 45.0
-  heat_per_kw: 0.0012           # degC/s per kW hydraulic power
-  base_heat_cps: 0.01           # idle heating degC/s
+  heat_per_kw: 0.002            # degC/s per kW hydraulic power
+  base_heat_cps: 0.08           # idle heating degC/s
   cooling_coeff: 0.004          # 1/s towards ambient
 
 engine:
@@ -74,8 +74,8 @@ vibration:
   per_kw: 0.006
 
 sensors:                        # sample rates (Hz) and noise std
-  fast_rate_hz: 50
-  slow_rate_hz: 10
+  fast_rate_hz: 25
+  slow_rate_hz: 5
   noise:
     position_rad: 0.0005
     velocity_rps: 0.002
