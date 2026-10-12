@@ -22,6 +22,24 @@
 |---|---|
 | ![AI](docs/images/ai.png) | ![분석](docs/images/analysis.png) |
 
+## 웹 데모 (설치 없이)
+
+**https://jngbnss.github.io/twinpilot-ai/** — 서버 없이 브라우저에서 바로 실행되는 정적 데모(`pages/`).
+시뮬레이터·Control Safety Layer·스크립트 조종기·`residual` 특징·탐지기 4종을 JavaScript로 옮겼고,
+탐지기 파라미터(Isolation Forest 트리 포함)는 저장소 학습 코드로 학습해 JSON으로 내보낸 것을 그대로 쓴다.
+자동/수동 조종, 고장 5종 주입, 실시간 센서·점수 그래프, 알림 로그, 실행 중 Precision/Recall 비교를 제공한다.
+
+```bash
+# 모델 재학습·내보내기 (정상 train/val + test 평가, 약 2분) → pages/model/detector-v1-residual.json
+uv run python scripts/pages_demo/export_model.py --root .demo-data --workers 8
+# Python 기준값 생성 후 JS 포트 검증 (특징·점수 상대오차 < 1e-9, 무노이즈 궤적·안전 규칙 일치)
+uv run python scripts/pages_demo/make_fixture.py --model .demo-data/detector-v1-residual.joblib --out .demo-data/fixture.json
+node scripts/pages_demo/check_demo.mjs .demo-data/fixture.json
+```
+
+센서 노이즈 난수 생성기만 Python(PCG64)과 다르다. 모델은 자동 조종 정상 데이터로만 학습했으므로
+수동 조종에서는 오경보가 크게 늘어난다(아래 "미확인 조건" 결과와 같은 현상).
+
 ## 빠른 시작
 
 요구: [uv](https://docs.astral.sh/uv/), Node 24.

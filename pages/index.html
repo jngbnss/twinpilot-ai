@@ -1,2 +1,229 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TwinPilot AI</title><style>body{margin:0;background:#f4f1ea;color:#25323b;font-family:system-ui,sans-serif}.wrap{max-width:860px;margin:auto;padding:10vh 28px}small{letter-spacing:.16em;color:#826729}h1{font-size:clamp(48px,9vw,92px);line-height:.95;margin:18px 0}p{font-size:20px;line-height:1.7;max-width:720px}.card{margin-top:40px;padding:24px;border:1px solid #ccd2d4;border-radius:18px;background:#fff}a{color:#826729;font-weight:700}</style></head><body><main class="wrap"><small>SSAFY AI × OSS · PROJECT P7</small><h1>TwinPilot AI</h1><p>가상 굴착기의 센서 이상을 규칙 기준선과 학습 모델로 비교하는 시뮬레이션 기반 디지털 트윈 프로토타입입니다.</p><section class="card"><strong>현재 단계</strong><p>실제 장비와 연결되지 않은 Level 1 시뮬레이션입니다. Python 시뮬레이터와 FastAPI 기반이 준비되어 있으며 React 조종 화면은 후속 단계입니다.</p><a href="https://github.com/jngbnss/twinpilot-ai">GitHub에서 시뮬레이션 구조 보기 →</a></section></main></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TwinPilot AI 데모</title>
+<meta name="description" content="가상 굴착기를 조종하고 고장을 주입해 규칙 기준선과 학습 모델(Isolation Forest)의 이상 탐지를 비교하는 Level 1 시뮬레이션 디지털 트윈 데모. 실제 장비와 연결되어 있지 않습니다.">
+<meta name="theme-color" content="#0f151a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f151a'/%3E%3Cpath d='M6 23h14l2-4H9z' fill='%23f2a541'/%3E%3Cpath d='M14 18l6-9 6 4-3 4' stroke='%23f2a541' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="logo" aria-hidden="true"></span>
+    <div>
+      <strong>TwinPilot AI</strong>
+      <span class="sub">가상 굴착기 디지털 트윈 · 이상 탐지 데모</span>
+    </div>
+  </div>
+  <div class="top-right">
+    <span class="sim-badge" title="모든 센서값은 브라우저에서 계산되는 가상값입니다">SIMULATED SENSOR · Level 1</span>
+    <a class="gh" href="https://github.com/jngbnss/twinpilot-ai" target="_blank" rel="noopener">GitHub 저장소 ↗</a>
+  </div>
+</header>
 
+<div class="notice" role="note">
+  <strong>시뮬레이션 데모입니다.</strong>
+  실제 굴착기·실제 센서·서버와 연결되어 있지 않고, 모든 값은 이 브라우저 안에서 계산됩니다.
+  이상 탐지 결과는 원인 진단이 아니며, 안전 계층은 AI 출력과 무관하게 동작합니다.
+</div>
+
+<main class="layout">
+  <!-- ============================================================ 3D + control -->
+  <section class="stage card" aria-label="3D 조종 화면">
+    <div class="viewport" id="viewport">
+      <div class="loading" id="loading">모델과 3D 장면을 불러오는 중…</div>
+      <div class="hud">
+        <div class="hud-row">
+          <span class="chip" id="hud-mode">자동 조종</span>
+          <span class="chip mono" id="hud-time">t = 0.0 s</span>
+          <span class="chip" id="hud-task">운반 0 / 3</span>
+        </div>
+        <div class="hud-row">
+          <span class="chip risk" id="hud-risk" data-level="0">안전 · 정상</span>
+        </div>
+      </div>
+      <div class="hud-bottom" id="hud-alarm" hidden></div>
+      <div class="view-tools">
+        <button class="ghost sm" id="btn-view" type="button">운전석 시점</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="조종 모드">
+        <button type="button" id="btn-auto" class="on">자동 조종</button>
+        <button type="button" id="btn-manual">수동 조종</button>
+      </div>
+      <div class="seg" role="group" aria-label="시뮬레이션 속도">
+        <button type="button" data-speed="0" title="일시정지">❚❚</button>
+        <button type="button" data-speed="1" class="on">1×</button>
+        <button type="button" data-speed="2">2×</button>
+        <button type="button" data-speed="4">4×</button>
+      </div>
+      <button type="button" class="ghost" id="btn-reset" title="새 시드로 처음부터">새 실행</button>
+      <button type="button" class="estop" id="btn-estop" title="Space">비상 정지</button>
+    </div>
+
+    <p class="mode-note" id="mode-note"></p>
+
+    <div class="pad" id="pad" aria-label="조종 버튼 (누르고 있기)">
+      <div class="pad-group">
+        <span class="pad-title">주행</span>
+        <div class="dpad">
+          <button type="button" data-key="w" style="grid-area:up">▲<small>W</small></button>
+          <button type="button" data-key="a" style="grid-area:left">◀<small>A</small></button>
+          <button type="button" data-key="d" style="grid-area:right">▶<small>D</small></button>
+          <button type="button" data-key="s" style="grid-area:down">▼<small>S</small></button>
+        </div>
+      </div>
+      <div class="pad-group">
+        <span class="pad-title">상부 스윙</span>
+        <div class="pair">
+          <button type="button" data-key="q">↺ 좌<small>Q</small></button>
+          <button type="button" data-key="e">↻ 우<small>E</small></button>
+        </div>
+        <span class="pad-title">붐</span>
+        <div class="pair">
+          <button type="button" data-key="r">올림<small>R</small></button>
+          <button type="button" data-key="f">내림<small>F</small></button>
+        </div>
+      </div>
+      <div class="pad-group">
+        <span class="pad-title">암</span>
+        <div class="pair">
+          <button type="button" data-key="t">펴기<small>T</small></button>
+          <button type="button" data-key="g">접기<small>G</small></button>
+        </div>
+        <span class="pad-title">버킷</span>
+        <div class="pair">
+          <button type="button" data-key="y">열기<small>Y</small></button>
+          <button type="button" data-key="h">닫기<small>H</small></button>
+        </div>
+      </div>
+    </div>
+    <p class="hint">작업: 구역 <b class="za">A</b>의 운반물 3개를 구역 <b class="zb">B</b>로 옮기기. 버킷을 운반물 가까이에서 닫으면 집고, 구역 B 위에서 열면 내려놓습니다. 노란 원은 작업자 최소 거리(5 m), 붉은 영역은 금지 구역입니다.</p>
+  </section>
+
+  <!-- ============================================================ side column -->
+  <aside class="side">
+    <section class="card" aria-labelledby="h-fault">
+      <h2 id="h-fault">고장 주입 <span class="tag">정답 라벨로 기록</span></h2>
+      <div class="faults" id="fault-presets"></div>
+      <div class="fault-form">
+        <label>대상 <select id="fault-target"></select></label>
+        <label>심각도 <span class="mono" id="sev-val">0.6</span>
+          <input type="range" id="fault-sev" min="0.1" max="1" step="0.1" value="0.6">
+        </label>
+        <label>지속 <span class="mono" id="dur-val">20 s</span>
+          <input type="range" id="fault-dur" min="5" max="40" step="5" value="20">
+        </label>
+        <button type="button" class="primary" id="btn-inject">주입</button>
+      </div>
+      <ul class="active-faults" id="active-faults"></ul>
+    </section>
+
+    <section class="card" aria-labelledby="h-det">
+      <h2 id="h-det">탐지기 실시간 비교 <span class="tag">2 s 창 · 0.5 s 간격</span></h2>
+      <div class="detectors" id="detectors"></div>
+      <p class="fine">경보 = 연속 2개 창이 임계값 초과(백엔드 서비스와 동일). 점수 막대는 임계값 대비 비율입니다.</p>
+    </section>
+
+    <section class="card" aria-labelledby="h-safety">
+      <h2 id="h-safety">안전 계층 <span class="tag">결정론 규칙 · AI 미사용</span></h2>
+      <div class="safety" id="safety"></div>
+      <button type="button" class="ghost sm" id="btn-estop-reset" hidden>비상 정지 해제</button>
+    </section>
+  </aside>
+
+  <!-- ============================================================ charts -->
+  <section class="card wide" aria-labelledby="h-charts">
+    <div class="card-head">
+      <h2 id="h-charts">센서 · 점수 타임라인 <span class="tag">최근 30 s</span></h2>
+      <label class="inline">관절 <select id="chart-joint">
+        <option value="swing_joint">스윙</option><option value="boom_joint">붐</option>
+        <option value="arm_joint">암</option><option value="bucket_joint" selected>버킷</option>
+      </select></label>
+    </div>
+    <div class="charts">
+      <figure class="chart big"><figcaption>탐지 점수 ÷ 임계값 <span class="legend" id="legend-score"></span></figcaption><canvas id="c-score"></canvas></figure>
+      <figure class="chart"><figcaption id="cap-vel">관절 속도 vs 명령 (rad/s)</figcaption><canvas id="c-vel"></canvas></figure>
+      <figure class="chart"><figcaption id="cap-eff">관절 토크 effort (kN·m)</figcaption><canvas id="c-eff"></canvas></figure>
+      <figure class="chart"><figcaption>유압유 온도 (°C)</figcaption><canvas id="c-temp"></canvas></figure>
+      <figure class="chart"><figcaption>
+        <select id="chart-channel" aria-label="표시할 센서 채널"></select></figcaption><canvas id="c-chan"></canvas></figure>
+    </div>
+    <p class="fine">음영 = 주입된 고장 구간(정답 라벨). 센서값은 SIMULATED SENSOR입니다.</p>
+  </section>
+
+  <!-- ============================================================ log + metrics -->
+  <section class="card" aria-labelledby="h-log">
+    <div class="card-head">
+      <h2 id="h-log">알림 로그</h2>
+      <div class="seg sm" role="group" aria-label="로그 필터">
+        <button type="button" data-log="all" class="on">전체</button>
+        <button type="button" data-log="anomaly">이상</button>
+        <button type="button" data-log="safety">안전</button>
+      </div>
+    </div>
+    <ol class="log" id="log"></ol>
+  </section>
+
+  <section class="card" aria-labelledby="h-pr">
+    <div class="card-head">
+      <h2 id="h-pr">Precision / Recall 비교 <span class="tag">이번 실행</span></h2>
+      <div class="seg sm" role="group" aria-label="집계 구간">
+        <button type="button" data-scope="auto" class="on">자동 조종 구간</button>
+        <button type="button" data-scope="all">전체</button>
+      </div>
+    </div>
+    <div id="pr"></div>
+    <p class="fine">창 단위 집계: 창의 50% 이상이 고장 구간이면 이상(1). 고장 경계에 걸친 창과 고장 종료 후 10 s는 제외 — 저장소 <code>features/dataset.py</code>, <code>evaluation/metrics.py</code>와 같은 규칙입니다. 지연 = 고장 시작부터 첫 이상 판정 창까지.</p>
+  </section>
+
+  <section class="card wide" aria-labelledby="h-offline">
+    <h2 id="h-offline">저장소 오프라인 평가 <span class="tag">같은 모델 · dataset v1 test split</span></h2>
+    <div id="offline"></div>
+    <p class="fine" id="offline-note"></p>
+  </section>
+
+  <section class="card wide about" aria-labelledby="h-about">
+    <h2 id="h-about">이 데모가 하는 것 / 하지 않는 것</h2>
+    <div class="cols">
+      <div>
+        <h3>하는 것</h3>
+        <ul>
+          <li>저장소의 Python 시뮬레이터(<code>sim/</code>)를 JavaScript로 옮겨 브라우저에서 50 Hz로 실행합니다. 노이즈가 없는 조건에서 Python과 궤적·안전 규칙 판정이 일치하는 것을 확인했습니다.</li>
+          <li>센서 25 Hz / 5 Hz 가상 telemetry → 2 s 창 → 물리 잔차(디지털 트윈 잔차) 특징 83개 → 탐지기 4종. 특징 계산은 <code>ai/twinpilot_ai/features/windows.py</code>의 <code>residual</code> 세트를 옮긴 것입니다.</li>
+          <li>탐지기 파라미터(정상 분포 통계, 임계값, Isolation Forest 트리 200개)는 저장소 학습 코드(<code>training/train.py</code>)로 학습해 JSON으로 내보낸 것을 그대로 씁니다. 브라우저 점수는 Python 점수와 상대오차 1e-9 이내로 같습니다.</li>
+          <li>Control Safety Layer(<code>control/safety.py</code>)의 비상 정지, 명령 타임아웃, 변화율 제한, 관절 한계, 전복 위험, 작업자 거리, 금지 구역 규칙을 그대로 적용합니다.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>하지 않는 것</h3>
+        <ul>
+          <li>실제 장비 제어, 실제 센서 수집, 안전 인증, 실제 고장 원인 진단은 하지 않습니다.</li>
+          <li>물리 모델은 근사(20 t급 가정)이며 검증된 장비 모델이 아닙니다.</li>
+          <li>센서 노이즈 난수 생성기는 Python(PCG64)과 다릅니다. 분포는 같지만 값의 순서가 달라 실행 결과는 Python 데이터셋과 숫자 단위로 같지 않습니다.</li>
+          <li>모델은 자동 조종(스크립트 조종기) 정상 데이터로만 학습했습니다. 수동 조종은 학습에 없던 패턴이라 오경보가 크게 늘어납니다 — 저장소 문서의 "미확인 조건" 한계와 같은 현상입니다.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>SSAFY AI × OSS · P7 TwinPilot AI — Level 1 시뮬레이션 디지털 트윈 프로토타입</span>
+  <a href="https://github.com/jngbnss/twinpilot-ai" target="_blank" rel="noopener">github.com/jngbnss/twinpilot-ai</a>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

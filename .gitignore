@@ -30,3 +30,6 @@ ai/models/
 .env
 .idea/
 .vscode/
+
+# 웹 데모 모델 학습용 임시 데이터
+.demo-data/
